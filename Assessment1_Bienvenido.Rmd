@@ -1,0 +1,639 @@
+---
+title: "Assessment1"
+author: "Bienvienido"
+date: "15/11/2020"
+output: pdf_document
+---
+
+### Assessment Task 1: Comparison of classifiers
+In this task compare the performance of the supervised learning algorithms Linear Discriminant Analysis, Quadratic Discriminant Analysis and the Naïve Bayes Classifier using a publicly available Blood Pressure Data. The data to be used for this task is provided in the HBblood.csv file in the Assessment 1 folder.
+
+The HBblood.csv dataset contains values of the percent HbA1c (a measure of the amount of glucose and haemoglobin joined together in blood) and systolic blood pressure (SBP) (in mm/Hg) for 1,200 clinically healthy female patients within the ages 60 to 70 years. Additionally, the ethnicity, Ethno, for each patient was recorded and discombobulated into three groups, A, B or C, for analysis.
+
+1. Discuss and justify which of the supervised learning algorithms (i.e. Linear Discriminant Analysis, Quadratic Discriminant Analysis and the Naïve Bayes Classifier) would you choose for predicting the response Ethno using HbA1c and SBP as the feature variables. Provide any plots/images needed to support your discussion. Hint: Base your answer on the empirical properties of the data.
+
+---
+---
+
+Installing library packages and libraries for all tasks (1-3)
+
+library("ggpubr")
+
+library("psych")
+
+library("gridExtra")
+
+library("dplyr")
+
+library("tidyr")
+
+library("ggplot2")
+
+library("naivebayes")
+
+Accessing the data "HBblood.csv"
+
+---
+
+
+```{r, include=FALSE, results=FALSE, warning=FALSE}
+
+library("ggpubr")
+library("psych")
+library("gridExtra")
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+library("naivebayes")
+library(caret, warn.conflicts = F, quietly = T)
+
+```
+
+```{r , include=TRUE}
+data = read.csv('HBblood.csv')
+
+```
+```{r, results= TRUE}
+str(data)
+#data Transformation
+data$Ethno = as.factor(data$Ethno)
+
+```
+Note: Ethno has been transformed from CHar to Factor variable.
+Note that data has 1200 observations and the variables are Ethno = Character(Categorical 4=levels),
+HbA1c = Numerical, and
+SBP = Numerical
+
+```{r, results=TRUE}
+#visualisation
+pairs.panels(data[-1])
+```
+---
+The graph shown above shows that HbA1c and SBP are not normally distributed and are positively skewed. 
+It also shows that HbA1c and SBP are not related or independent with each other with Correlation coefficient is only -0.01
+
+---
+```{r, results=TRUE}
+
+data$HbA1c = sqrt(data$HbA1c)
+data$SBP = sqrt(data$SBP)
+#visualisation of data
+pairs.panels(data[-1])
+
+```
+---
+After data transformation using "sqrt", data is now normally distributed
+
+---
+
+```{r, results=TRUE}
+#covariance matrix
+cov(data [-1])
+
+```
+---
+---
+Note that covariance matrix  are different in all class.
+
+
+Naïve Bayes 
+
+•	Assumption that the predictor variables are conditionally independent of each other
+
+LDA
+
+•	LDA assumes normally distributed data and a class-specific mean vector.
+
+•	LDA assumes a common covariance matrix. So, a covariance matrix that is common to all classes in a data set.
+
+QDA 
+
+•	Observation of each class is drawn from a normal distribution (same as LDA).
+
+•	QDA assumes that each class has its own covariance matrix (different from LDA).
+
+Naive Bayes can work either numerical and categorical
+Both LDA and QDA require numerical predictors // in this case our predictors are numerical
+
+//Since our data predictors are numeric, follows normal distribution, and different covariance...
+
+#### Conclusion: Therefore, the supervised learning algorithm that should be used in the case is QDA
+
+---
+---
+
+### Assessment Task 2: Application of a classifier
+
+The Mushroom dataset, available from the UCI Data Repository https://archive.ics.uci.edu/ml/datasets/Mushroom, contains 8124 observations describing mushrooms belonging to classes edible or potentially poisonous (first variable encoded ‘e’ or ‘p’, respectively). There are 22 categorical predictors (variables 2 to 23), one of them with missing values (‘?’).
+
+#read mushroom data -> data2
+```{r, include=TRUE}
+
+data2 <- read.table(file ="mushroom2.csv", header=FALSE, sep = ",")
+```
+```{r, include=TRUE}
+#data transformation
+str(data2)
+data2$V1 = as.factor(data2$V1)
+data2$V2 = as.factor(data2$V2)
+data2$V3 = as.factor(data2$V3)
+data2$V4 = as.factor(data2$V4)
+data2$V5 = as.factor(data2$V5)
+data2$V6 = as.factor(data2$V6)
+data2$V7 = as.factor(data2$V7)
+data2$V8 = as.factor(data2$V8)
+data2$V9 = as.factor(data2$V9)
+data2$V10 = as.factor(data2$V10)
+data2$V11 = as.factor(data2$V11)
+data2$V12 = as.factor(data2$V12)
+data2$V13 = as.factor(data2$V13)
+data2$V14 = as.factor(data2$V14)
+data2$V15 = as.factor(data2$V15)
+data2$V16 = as.factor(data2$V16)
+data2$V17 = as.factor(data2$V17)
+data2$V18 = as.factor(data2$V18)
+data2$V19 = as.factor(data2$V19)
+data2$V20 = as.factor(data2$V20)
+data2$V21 = as.factor(data2$V21)
+data2$V22 = as.factor(data2$V22)
+data2$V23 = as.factor(data2$V23)
+summary(data2)
+#NA's : 2480 are found in V12
+
+```
+
+
+As noticed, the variables V1-V2 are transformed from character class to factor class and the variable V12 with ?:2480 are removed.
+
+*PLEASE NOT THAT I WAS ABLE TO DELETE V12 ROWS WITH ?/NAS IN R STUDIO BUT IT IS DIFFERENT IN R MARKDOWN. HOWEVER, RESULT SHOWS LITTLE DIFFERENCE. R RESULTS WITH 5633 OBS. OF 23 VARIABLES. 
+
+----CODES AND RESULT IN R ----
+
+#predicting data
+
+nb_predict2_train = predict(nb_model2, train.data2)
+
+table(nb_predict2_train, train.data2$V1)
+
+nb_predict2_train
+
+#nb_predict2_train    e    p
+#e 2779  216
+#p   12 1509
+
+#Accuracy: 95%
+
+nb_predict2_test = predict(nb_model2, test.data2)
+
+table(nb_predict2_test, test.data2$V1)
+
+#nb_predict2_test   e   p
+#e 694  72
+#p   3 359
+
+#Accuracy: 93.35%
+
+#predicting data
+
+confusionMatrix(predict(nb_model2,newdata = train.data2),
+                train.data2$V1)
+                
+#Accuracy: 94.31
+
+confusionMatrix(predict(nb_model2,newdata = test.data2),
+                test.data2$V1)
+                
+#Accuracy: 94.21
+
+----------
+
+```{r, include=TRUE}
+
+#removing rows with NA's
+data2 = na.omit(data2)
+summary(data2)
+```
+
+1. Randomly split the dataset into a training subset and a test subset containing 80% and 20% of the data. Provide and comment your R-code.
+```{r, include=TRUE, warning=FALSE}
+
+##partition data set into train and set and randomly split it
+set.seed(123) 
+# Creating index for randomly splitting the dataset
+ind2= createDataPartition(data2$V1, p=0.8, list=FALSE)
+train.data2 <- data2[ind2,]
+test.data2 <- data2[-ind2,]
+
+# print number of observations in test vs. train
+c(nrow(train.data2), nrow(test.data2))
+# Proportions of V1 EDIBLE and POISONOUS
+table(train.data2$V1) %>% prop.table() 
+
+
+```
+2. Define and justify a classifier – from Week 2- to classify the mushroom population into edible or poisonous. The classifier needs to use all 22 predictors (variables V2 toV23) to model the dependent variable (V1) .
+
+
+##### Ans: Since the data predictors are not numericals, LDA and QdA cannot be used. It also shows that the predictors are not related or independent to each other. Therefore, Naive Bayes is used in this situation
+
+3. Implement the proposed classifier from Question 2 using the training data subset from Question 1. Provide and comment R code. Display the most relevant parts of the results
+```{r, include=TRUE, warning=FALSE}
+#Training the model using Naive Bayes
+nb_model2 = naive_bayes(V1 ~., data = train.data2)
+nb_model2
+
+#predicting data
+confusionMatrix(predict(nb_model2,newdata = train.data2),
+                train.data2$V1)
+#Accuracy: 94.31
+
+confusionMatrix(predict(nb_model2,newdata = test.data2),
+                test.data2$V1)
+#Accuracy: 94.21
+```
+
+4. Interpret and discuss the relationships between the predictors and response variables of the fitted model based on the summary shown in Question 3. 
+
+##### Ans: The relationship between the predictors and variables are good and correlated since the model has high accuracy using the predictors. The predictors can identify whether the mushrooms are poisonous or edible.
+
+
+5. Discuss the performance of the proposed classifier for both training and test data.
+
+##### Ans: By using the Naive Bayes model on training data, we got a high accuracy rate of 94.31%. This means that our model performs well using the training data. Thus as we used our model to our test dta, we also have a high accuracy of 94.31%
+
+
+
+---
+
+### Assessment Task 3: Implementation of classifiers
+
+In this task, compare the performance of the supervised learning algorithms Linear Discriminant Analysis and the Naïve Bayes Classifier using the banknote authentication dataset, which is publicly available at https://archive.ics.uci.edu/ml/datasets/banknote+authentication. The data were extracted from images using Wavelet transform tool. The data contain 1372 observations with 4 inputs (variance of wavelet transformed image, skewness of wavelet transformed image, curtosis of wavelet transformed image and entropy of image) and 1 output (Class), which is used as target and only has two values of 0 (False) and 1 (True).
+
+1. Implement both the LDA and Naïve Bayes classifiers to classify the authentication of bank notes. Display the R-code, code comments and model summaries for both models.
+
+---
+```{r, results='hide', warning=FALSE}
+#read data "banknote.txt" from file location
+data3 =read.table(file ="banknote.txt", header=FALSE, sep = ",", na.strings = "?", 
+                  col.names = c("variance","skewness","curtosis","entropy","target"))
+#checking data classes
+str(data3)
+#transform target variable from character to factor
+data3$target = as.factor(data3$target)
+
+#visualisation of data3
+pairs.panels(data3[-5])
+
+#checking on covariances
+cov(data3[,1:4])
+
+
+##partition data set into train and set and randomly split it
+set.seed(123) 
+# Creating index for randomly splitting the dataset
+ind3= createDataPartition(data3$target, p=0.8, list=FALSE)
+train.data3 <- data3[ind3,]
+test.data3 <- data3[-ind3,]
+# Training the model
+c(nrow(train.data3), nrow(test.data3))
+
+#using Naive Bayes
+nb_model3 = naive_bayes(target ~., data = train.data3)
+
+#calculate how to perform the data
+nb_predict3 = predict(nb_model3, train.data3)
+table(nb_predict3, train.data3$target)
+
+#using LDA
+lda3 <- train(target~.,
+                     data=train.data3,
+                     trControl = trainControl(method = "cv", number = 5),
+                     method = "lda")
+#confusiion matrix 
+confusionMatrix(predict(lda3,newdata = train.data3),
+                train.data3$target)
+confusionMatrix(predict(lda3,newdata = test.data3),
+                test.data3$target)
+
+```
+2. Compare and Discuss the performance of the LDA and Naïve Bayes classifiers obtained in Question 1.
+
+##### Ans: 
+
+```{r, include= TRUE}
+table(nb_predict3, train.data3$target)
+```
+##### As the result above, we are able to classify 530 out of 610 for "0" cases correctly and 381 out of 488  for"1" cases correctly. This means the ability of our Naive Bayes Algorithm to predict "0" cases is about 87% and 78% for "1" cases, resulting in an overall accuracy of 82%.
+
+```{r, include= TRUE}
+confusionMatrix(predict(lda3,newdata = train.data3),
+                train.data3$target)
+```
+##### Shown on the above result, the accuracy of LDA is 97.5 %.
+
+##### Therefore, LDA has performed better than Naive bayes.
+
+
+3. Discuss your findings from Question 1 and Question 2 by using the assumptions of LDA and Naïve Bayes classifiers as the basis of your discussion. Provide any plots/images or analysis needed to support your discussion.
+
+
+#####  As shown in Question 1, we illustrated that the data seems to follows normal distribution although with a little skewed to the left or right. It was also illustrated that the data doesn't have strong conditionally independently  with each other. It can also be noticed that the data or predictors are numericals which is a strong idication of using LDA.
+  
+#####  With this, LDA assumptions has been met better than Naive Bayes, thus resulting in a better model accuracy of LDA 97.5% than naive bayes 82%.
+
+
+---
+
+---
+
+### Appendix:
+
+R code:
+
+#installing libraries
+
+library("ggpubr")
+library("psych")
+library("gridExtra")
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+library("naivebayes")
+
+############ task1 #############3
+
+library(caret, warn.conflicts = F, quietly = T)
+
+data = read.csv('HBblood.csv')
+
+str(data)
+
+#dta transformation
+
+data$Ethno = as.factor(data$Ethno)
+
+
+
+#visualisation of data
+
+pairs.panels(data[-1])
+
+
+#normalizing the data
+
+data$HbA1c = sqrt(data$HbA1c)
+
+data$SBP = sqrt(data$SBP)
+
+#visualisation
+
+pairs.panels(data[-1])
+
+#covariance matrix
+
+cov(data [-1])
+
+
+############  task2   #############
+rm(list=ls())
+
+data2 <- read.table(file ="mushroom2.csv", header=FALSE, sep = ",", na.strings = "?")
+
+str(data2)
+
+is.na.data.frame(data2)
+
+summary(data2)
+
+data2$V1 = as.factor(data2$V1)
+data2$V2 = as.factor(data2$V2)
+data2$V3 = as.factor(data2$V3)
+data2$V4 = as.factor(data2$V4)
+data2$V5 = as.factor(data2$V5)
+data2$V6 = as.factor(data2$V6)
+data2$V7 = as.factor(data2$V7)
+data2$V8 = as.factor(data2$V8)
+data2$V9 = as.factor(data2$V9)
+data2$V10 = as.factor(data2$V10)
+data2$V11 = as.factor(data2$V11)
+data2$V12 = as.factor(data2$V12)
+data2$V13 = as.factor(data2$V13)
+data2$V14 = as.factor(data2$V14)
+data2$V15 = as.factor(data2$V15)
+data2$V16 = as.factor(data2$V16)
+data2$V17 = as.factor(data2$V17)
+data2$V18 = as.factor(data2$V18)
+data2$V19 = as.factor(data2$V19)
+data2$V20 = as.factor(data2$V20)
+data2$V21 = as.factor(data2$V21)
+data2$V22 = as.factor(data2$V22)
+data2$V23 = as.factor(data2$V23)
+
+summary(data2)
+
+#NA's : 2480 are found in V12
+
+
+#removing rows with NA's
+
+data2 = na.omit(data2)
+
+summary(data2)
+
+#Visualization
+
+cov(data2[-1])
+
+ggplot(data2) + geom_bar(aes(x = V1))
+ggplot(data2) +
+  geom_col(aes(x = V1, y = n, fill = V1), position = "fill") +
+  scale_fill_manual(values = V1)
+
+
+
+##partition data set into train and set and randomly split it
+
+set.seed(123) 
+
+# Creating index for randomly splitting the dataset
+
+ind2= createDataPartition(data2$V1, p=0.8, list=FALSE)
+
+train.data2 <- data2[ind2,]
+
+test.data2 <- data2[-ind2,]
+
+c(nrow(train.data2), nrow(test.data2))
+
+summary(data2)
+
+#Training the model using Naive Bayes
+
+nb_model2 = naive_bayes(V1 ~., data = train.data2)
+
+nb_model2
+
+#the probability of e = 51.8% and p = 48.2%
+
+#predicting data
+
+nb_predict2_train = predict(nb_model2, train.data2)
+
+table(nb_predict2_train, train.data2$V1)
+
+nb_predict2_train
+
+#nb_predict2_train    e    p
+#e 2779  216
+#p   12 1509
+#Accuracy: 95%
+
+
+nb_predict2_test = predict(nb_model2, test.data2)
+
+table(nb_predict2_test, test.data2$V1)
+
+#nb_predict2_test   e   p
+#e 694  72
+#p   3 359
+
+#Accuracy: 93.35%
+
+#predicting data
+
+confusionMatrix(predict(nb_model2,newdata = train.data2),
+                train.data2$V1)
+#Accuracy: 94.31
+
+confusionMatrix(predict(nb_model2,newdata = test.data2),
+                test.data2$V1)
+                
+#Accuracy: 94.21
+
+
+
+
+###########   Task 3  #############
+
+#read data "banknote.txt" from file location
+data3 =read.table(file ="banknote.txt", header=FALSE, sep = ",", na.strings = "?", 
+                  col.names = c("variance","skewness","curtosis","entropy","target"))
+                  
+head(data3)
+
+#checking data classes
+
+str(data3)
+
+#transform target variable from character to factor
+
+data3$target = as.factor(data3$target)
+
+str(data3)
+
+#visualisation of data3
+
+pairs.panels(data3[-5])
+
+#checking on covariances
+
+cov(data3[,1:4])
+
+pairs(data3[,1:4])
+
+##partition data set into train and set and randomly split it
+
+set.seed(123) 
+
+# Creating index for randomly splitting the dataset
+
+ind3= createDataPartition(data3$target, p=0.8, list=FALSE)
+
+train.data3 <- data3[ind3,]
+
+test.data3 <- data3[-ind3,]
+
+# Training the model
+
+c(nrow(train.data3), nrow(test.data3))
+
+summary(data3)
+
+#using Naive Bayes
+
+naive.Bayes3 <- train(target~.,
+                     data=train.data3,
+                     trControl = trainControl(method = "cv", number = 3),
+                     method = "nb")
+naive.Bayes3
+
+#predicting the data and confusion matrix
+
+confusionMatrix(predict(naive.Bayes3,newdata = train.data3),
+                train.data3$target)
+                
+confusionMatrix(predict(naive.Bayes3,newdata = test.data3),
+                test.data3$target)
+
+nb_model3 = naive_bayes(target ~., data = train.data3)
+
+nb_model3
+
+#calculate how to perform the data
+
+nb_predict3 = predict(nb_model3, train.data3)
+
+table(nb_predict3, train.data3$target)
+
+nb_predict3
+
+#nb_predict3   0   1
+#0 530 107
+#1  80 381
+
+#As the result, we are able to classify 530 out of 610 for "0" cases correctly and
+#381 out of 488  for"1" cases correctly. This means the ability of our Naive Bayes Algorithm 
+#to predict "0" cases is about 87% and 78% for "1" cases, resulting in an overall accuracy of 82%
+
+#using LDA
+
+lda3 <- train(target~.,
+                     data=train.data3,
+                     trControl = trainControl(method = "cv", number = 5),
+                     method = "lda")
+lda3
+
+confusionMatrix(predict(lda3,newdata = train.data3),
+                train.data3$target)
+                
+confusionMatrix(predict(lda3,newdata = test.data3),
+                test.data3$target)
+
+#covariance checking
+
+library(heplots) 
+library(ggplot2)
+library(dplyr)
+install.packages("gridExtra")
+library(gridExtra)
+
+#note this code runs on R but not in RMarkdown.
+
+plot <- list()
+box_variables3 <- c("variance","skewness","curtosis","entropy")
+for(i in box_variables3) {
+  plot[[i]] <- ggplot(data3, 
+                      aes_string(x = "target", 
+                                 y = i, 
+                                 col = "target", 
+                                 fill = "target")) + 
+    geom_boxplot(alpha = 0.2) + 
+    theme(legend.position = "none") + 
+    scale_color_manual(values = c("blue", "red")) +
+    scale_fill_manual(values = c("blue", "red"))
+}
+
+do.call(grid.arrange, c(plot, nrow = 1))
+
+#The four different boxplots show us that the length of each plot clearly the same .This is an indication of equal variances. THus LDA is bet to used.
+
